@@ -24,7 +24,7 @@ type Client struct {
 	appId        string
 	apiKey       string
 	mchId        string
-	subAppid	 string
+	subAppId     string
 	subMchId     string
 	Client       *http.Client
 	tlsClient    *http.Client
@@ -48,22 +48,11 @@ func New(appId, apiKey, mchId string, isProduction bool) (client *Client) {
 	return client
 }
 
-func NewProvider(appId, mchId, subAppid, subMchId, apiKey string, isProduction bool) (client *Client){
-	client = &Client{}
-	client.appId = appId
-	client.mchId = mchId
-	client.subAppid = subAppid
-	client.subMchId = subMchId
-	client.apiKey = apiKey
-	client.Client = http.DefaultClient
-	client.isProduction = isProduction
-	if isProduction {
-		client.apiDomain = kProductionURL
-	} else {
-		client.apiDomain = kSandboxURL
-	}
+func (this *Client) NewProvider(subAppid, subMchId string) (client *Client){
+	clone := *this
+	clone.subAppId = subAppid
+	clone.subMchId = subMchId
 	return client
-
 }
 
 func initTLSClient(cert []byte, password string) (tlsClient *http.Client, err error) {
@@ -132,7 +121,7 @@ func (this *Client) URLValues(param Param, key string) (value url.Values, err er
 	}
 	p.Set("mch_id", this.mchId)
 	if this.isProvider(){
-		p.Set("sub_appid",this.subAppid)
+		p.Set("sub_appid",this.subAppId)
 		p.Set("sub_mch_id",this.subMchId)
 	}
 
@@ -276,7 +265,7 @@ func (this *Client) BuildAPI(paths ...string) string {
 }
 
 func (this *Client) isProvider() bool{
-	if this.subMchId == "" || this.subAppid == ""{
+	if this.subMchId == "" || this.subAppId == ""{
 		return false
 	}
 	return true
