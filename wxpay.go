@@ -52,7 +52,7 @@ func (this *Client) NewProvider(subAppid, subMchId string) (client *Client){
 	clone := *this
 	clone.subAppId = subAppid
 	clone.subMchId = subMchId
-	return client
+	return &clone
 }
 
 func initTLSClient(cert []byte, password string) (tlsClient *http.Client, err error) {
