@@ -24,6 +24,8 @@ type Client struct {
 	appId        string
 	apiKey       string
 	mchId        string
+	subAppid	 string
+	subMchId     string
 	Client       *http.Client
 	tlsClient    *http.Client
 	apiDomain    string
@@ -44,6 +46,24 @@ func New(appId, apiKey, mchId string, isProduction bool) (client *Client) {
 		client.apiDomain = kSandboxURL
 	}
 	return client
+}
+
+func NewProvider(appId, mchId, subAppid, subMchId, apiKey string, isProduction bool) (client *Client){
+	client = &Client{}
+	client.appId = appId
+	client.mchId = mchId
+	client.subAppid = subAppid
+	client.subMchId = subMchId
+	client.apiKey = apiKey
+	client.Client = http.DefaultClient
+	client.isProduction = isProduction
+	if isProduction {
+		client.apiDomain = kProductionURL
+	} else {
+		client.apiDomain = kSandboxURL
+	}
+	return client
+
 }
 
 func initTLSClient(cert []byte, password string) (tlsClient *http.Client, err error) {
@@ -104,12 +124,18 @@ func (this *Client) LoadCertFromBase64(cert string) (err error) {
 	return nil
 }
 
+//为参数添加应用id、商户号、随机字符串、签名与回调地址字段
 func (this *Client) URLValues(param Param, key string) (value url.Values, err error) {
 	var p = param.Params()
 	if appId := p.Get("appid"); appId == "" {
 		p.Set("appid", this.appId)
 	}
 	p.Set("mch_id", this.mchId)
+	if this.isProvider(){
+		p.Set("sub_appid",this.subAppid)
+		p.Set("sub_mch_id",this.subMchId)
+	}
+
 	p.Set("nonce_str", GetNonceStr())
 
 	if _, ok := p["notify_url"]; ok == false {
@@ -247,6 +273,13 @@ func (this *Client) BuildAPI(paths ...string) string {
 		}
 	}
 	return path
+}
+
+func (this *Client) isProvider() bool{
+	if this.subMchId == "" || this.subAppid == ""{
+		return false
+	}
+	return true
 }
 
 func URLValueToXML(m url.Values) string {
