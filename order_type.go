@@ -43,6 +43,7 @@ type UnifiedOrderParam struct {
 	LimitPay       string // 否 上传此参数no_credit--可限制用户不能使用信用卡支付
 	OpenId         string // 否 trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识。openid如何获取，可参考【获取openid】。企业号请使用【企业号OAuth2.0接口】获取企业号内成员userid，再调用【企业号userid转openid接口】进行转换
 	SceneInfo      string // 否
+	ProfitSharing  string // 否 是否指定服务商分账 Y-是 N-否 字母要求大写，不传意味不分账。
 	StoreInfo      *StoreInfo
 }
 
@@ -79,6 +80,10 @@ func (this UnifiedOrderParam) Params() url.Values {
 	m.Set("limit_pay", this.LimitPay)
 	if this.OpenId != "" {
 		m.Set("openid", this.OpenId)
+	}
+
+	if this.ProfitSharing != ""{
+		m.Set("profit_sharing",this.ProfitSharing)
 	}
 
 	if this.StoreInfo != nil {
