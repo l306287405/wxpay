@@ -38,7 +38,7 @@ func (this *Client) AppPay(param UnifiedOrderParam) (result *PayInfo, err error)
 	if rsp != nil {
 		result = &PayInfo{}
 		if this.isProvider(){
-			result.AppId = this.subAppid
+			result.AppId = this.subAppId
 			result.PartnerId = this.subMchId
 		}else{
 			result.AppId = this.appId
