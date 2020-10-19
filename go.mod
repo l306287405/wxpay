@@ -1,4 +1,4 @@
-module github.com/smartwalle/wxpay/v2
+module github.com/l306287405/wxpay/v3
 
 go 1.12
 
